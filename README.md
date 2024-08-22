@@ -1,33 +1,31 @@
-# Elaina-MD
+# Elaina-MD2
 <p align="center">
     <img src="https://telegra.ph/file/6bcac493fae59b98c7914.png" width="100%" style="margin-left: auto;margin-right: auto;display: block;">
 </p>
 
-<!--<a href="https://visitor-badge.glitch.me/badge?page_id=KiyoEditz/Elaina-MD"><img title="Visitor" src="https://visitor-badge.glitch.me/badge?page_id=KiyoEditz/Elaina-MD"></a>-->
-<a href="https://github.com/KiyoEditz/Elaina-MD/network/members"><img title="Forks" src="https://img.shields.io/github/forks/KiyoEditz/Elaina-MD?label=Forks&color=blue&style=flat-square"></a>
-<a href="https://github.com/KiyoEditz/Elaina-MD/watchers"><img title="Watchers" src="https://img.shields.io/github/watchers/KiyoEditz/Elaina-MD?label=Watchers&color=green&style=flat-square"></a>
-<a href="https://github.com/KiyoEditz/Elaina-MD/stargazers"><img title="Stars" src="https://img.shields.io/github/stars/KiyoEditz/Elaina-MD?label=Stars&color=yellow&style=flat-square"></a>
-<a href="https://github.com/KiyoEditz/Elaina-MD/graphs/contributors"><img title="Contributors" src="https://img.shields.io/github/contributors/KiyoEditz/Elaina-MD?label=Contributors&color=blue&style=flat-square"></a>
-<a href="https://github.com/KiyoEditz/Elaina-MD/issues"><img title="Issues" src="https://img.shields.io/github/issues/KiyoEditz/Elaina-MD?label=Issues&color=success&style=flat-square"></a>
-<a href="https://github.com/KiyoEditz/Elaina-MD/issues?q=is%3Aissue+is%3Aclosed"><img title="Issues" src="https://img.shields.io/github/issues-closed/KiyoEditz/Elaina-MD?label=Issues&color=red&style=flat-square"></a>
-<a href="https://github.com/KiyoEditz/Elaina-MD/pulls"><img title="Pull Request" src="https://img.shields.io/github/issues-pr/KiyoEditz/Elaina-MD?label=PullRequest&color=success&style=flat-square"></a>
-<a href="https://github.com/KiyoEditz/Elaina-MD/pulls?q=is%3Apr+is%3Aclosed"><img title="Pull Request" src="https://img.shields.io/github/issues-pr-closed/KiyoEditz/Elaina-MD?label=PullRequest&color=red&style=flat-square"></a>
+<!--<a href="https://visitor-badge.glitch.me/badge?page_id=KiyoEditz/Elaina-MD2"><img title="Visitor" src="https://visitor-badge.glitch.me/badge?page_id=KiyoEditz/Elaina-MD2"></a>-->
+<a href="https://github.com/KiyoEditz/Elaina-MD2/network/members"><img title="Forks" src="https://img.shields.io/github/forks/KiyoEditz/Elaina-MD2?label=Forks&color=blue&style=flat-square"></a>
+<a href="https://github.com/KiyoEditz/Elaina-MD2/watchers"><img title="Watchers" src="https://img.shields.io/github/watchers/KiyoEditz/Elaina-MD2?label=Watchers&color=green&style=flat-square"></a>
+<a href="https://github.com/KiyoEditz/Elaina-MD2/stargazers"><img title="Stars" src="https://img.shields.io/github/stars/KiyoEditz/Elaina-MD2?label=Stars&color=yellow&style=flat-square"></a>
+<a href="https://github.com/KiyoEditz/Elaina-MD2/graphs/contributors"><img title="Contributors" src="https://img.shields.io/github/contributors/KiyoEditz/Elaina-MD2?label=Contributors&color=blue&style=flat-square"></a>
+<a href="https://github.com/KiyoEditz/Elaina-MD2/issues"><img title="Issues" src="https://img.shields.io/github/issues/KiyoEditz/Elaina-MD2?label=Issues&color=success&style=flat-square"></a>
+<a href="https://github.com/KiyoEditz/Elaina-MD2/issues?q=is%3Aissue+is%3Aclosed"><img title="Issues" src="https://img.shields.io/github/issues-closed/KiyoEditz/Elaina-MD2?label=Issues&color=red&style=flat-square"></a>
+<a href="https://github.com/KiyoEditz/Elaina-MD2/pulls"><img title="Pull Request" src="https://img.shields.io/github/issues-pr/KiyoEditz/Elaina-MD2?label=PullRequest&color=success&style=flat-square"></a>
+<a href="https://github.com/KiyoEditz/Elaina-MD2/pulls?q=is%3Apr+is%3Aclosed"><img title="Pull Request" src="https://img.shields.io/github/issues-pr-closed/KiyoEditz/Elaina-MD2?label=PullRequest&color=red&style=flat-square"></a>
 
 ## INFORMATION
 * A Multi Device based WhatsApp bot with various features.
 * Don't sell this source bot. 
 * If you are caught selling source bots, you will be dealt with seriously and you will have to make compensation according to the mistake.
 * Jika ketahuan menjual source bot maka akan di tindak secara serius dan harus melakukan ganti rugi sesuai dengan dengan kesalahan.
-* ada bug di panel yang membuat tidak bisa install module, saat ini sedang di perbaiki, sebagai solusi gunakan yarn install untuk proses install. setelah terinstall module nya silahkan run seperti biasa mengunakan index.js
 ## NOTES
-* bug ajg capek gua bgst, yang gak bisa install pakek yarn install ya ajg, kalok engga chat owner di wa 
-* bot bakal update berkala jika saya menemukan bug atau laporan bug.
-* sc ini selalu di belakang bot yang saya run pribadi, jadi silahkan cek fitur terbaru di nomor [`Klik Disini`](Https://wa.me/kontol)
-
+* 
+* 
+* 
 
 ## DEPLOYMENT
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/KiyoEditz/Elaina-MD)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/KiyoEditz/Elaina-MD2)
 
 ## UNTUK PENGGUNA WINDOWS/VPS/RDP
 
@@ -37,8 +35,8 @@
 * Unduh & Instal ImageMagick [`Klik Disini`](https://imagemagick.org/script/download.php)
 
 ```bash
-git clone https://github.com/KiyoEditz/Elaina-MD.git
-cd Elaina-MD 
+git clone https://github.com/KiyoEditz/Elaina-MD2.git
+cd Elaina-MD2 
 npm install
 node .
 ```
@@ -55,8 +53,8 @@ $ apt update && upgrade -y
 $ pkg install ffmpeg
 $ pkg install nodejs-lts
 $ pkg install git
-$ git clone https://github.com/KiyoEditz/Elaina-MD.git
-$ cd Elaina-MD
+$ git clone https://github.com/KiyoEditz/Elaina-MD2.git
+$ cd Elaina-MD2
 $ npm install
 $ node .
 ```
