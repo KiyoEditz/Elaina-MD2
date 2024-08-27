@@ -5,3 +5,4 @@ sessions
 database.json
 plugins/jadibot/
 .vs
+tmp/
