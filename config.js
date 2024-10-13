@@ -85,19 +85,30 @@ global.googlegemini = 'silahkan diisi token masing masing' // https://aistudio.g
 global.APIs = { // API Prefix
   // name: 'https://website'
   nrtm: 'https://nurutomo.herokuapp.com',
-  lol: 'https://api.lolhuman.xyz'
+  lol: 'https://api.lolhuman.xyz',
+  xteam: 'https://api.xteam.xyz',
+  males: 'https://malesin.xyz',
+  zein: 'https://api.zahwazein.xyz',
+  rose: 'https://api.itsrose.life',
+  skizo: 'https://skizo.tech',
+  saipul: 'https://saipulanuar.cf'
 }
 global.APIKeys = { // APIKey Here
   // 'https://website': 'apikey'
-  'https://api.lolhuman.xyz': 'Apikeymu'
+  //'https://api.lolhuman.xyz': 'Apikeymu',
+  'https://api.zahwazein.xyz': 'zenzkey_848b800b1f',
+  'https://api.xteam.xyz': 'cristian9407',
+  'https://api.lolhuman.xyz': 'Faykaloffc',
+  'https://api.itsrose.life': 'Rk-Ashbornt',
+  'https://skizo.tech' : 'sweattheartkyl'
 }
 // Kata APIKEY itu isi dengan apikeymu, dengan beli ke website itu
 
 /*============== WATERMARK ==============*/
-global.wm = '                「 Elaina 𝙱𝙾𝚃 汉  」' //Main Watermark
+global.wm = '                「 ElainaMD 汉  」' //Main Watermark
 global.wm2 = '꒷︶꒷꒥꒷ ‧₊˚ ꒰ฅ˘Elaina - Chan˘ฅ ꒱ ‧₊˚꒷︶꒷꒥꒷'
-global.wm3 = '⫹⫺ Elaina 𝙱𝙾𝚃'
-global.namedoc = 'Elaina`s Bot' //Main Name Menu Document
+global.wm3 = '⫹⫺ Elaina-MD'
+global.namedoc = 'Elaina`s' //Main Name Menu Document
 global.botdate = `⫹⫺ Day's: ${week} ${date}\nWeton: ${weton}`
 global.bottime = `⫹⫺TIME: \nWIB: ${wktuwib}\nWITA: ${wktuwita}\nWIT: ${wktuwit}`
 global.titlebot = '🎋 ┊ Simple WhatsApp Bot'
@@ -112,8 +123,8 @@ global.giflogo = 'https://telegra.ph/file/a46ab7fa39338b1f54d5a.mp4'
 global.thumblvlup = 'https://telegra.ph/file/a3e66e0fa840b08236c75.jpg'
 
 /*============== TEXT ==============*/
-global.wait = '```「▰▰▰▱▱▱▱▱▱▱」Loading...```'
-global.eror = '```404 error```'
+global.wait = '_*Tunggu sedang di proses...*_'
+global.eror = '_*Server Error*_'
 
 /*=========== TYPE DOCUMENT ===========*/
 global.dpptx = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
