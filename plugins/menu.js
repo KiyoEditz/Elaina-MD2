@@ -1,177 +1,91 @@
+// Script Ori By BochilGaming
+// Ditulis Ulang Oleh ImYanXiao
+
 import { promises } from 'fs'
-import canvafy from "canvafy"
 import { join } from 'path'
 import { xpRange } from '../lib/levelling.js'
 import moment from 'moment-timezone'
 import os from 'os'
 import fs from 'fs'
 import fetch from 'node-fetch'
-const { generateWAMessageFromContent,  prepareWAMessageMedia, proto } = (await import('@adiwajshing/baileys')).default
-let handler = async (m, { conn, usedPrefix: _p, __dirname, args, command}) => {
-let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : m.fromMe ? conn.user.jid : m.sender;
-let pp = await conn.profilePictureUrl(m.sender, 'image').catch(_ => 'https://i.ibb.co/2WzLyGk/profile.jpg')
+const { generateWAMessageFromContent, proto, getDevice } = (await import('@adiwajshing/baileys')).default
 
 const defaultMenu = {
   before: `
-`.trimStart(),
-  header: '',
-  body: '',
-  footer: '',
-  after: '',
-}
-let skntex = `Hai
-[ 𝐃 𝐀 𝐒 𝐇 𝐁 𝐎 𝐀 𝐑 𝐃 ]
-• 𝐍𝐚𝐦𝐚 𝐁𝐨𝐭: *R E M B O T Z*
-• 𝐖𝐚𝐤𝐭𝐮: 
-• 𝐓𝐚𝐧𝐠𝐠𝐚𝐥: 
-• 𝐈𝐬𝐥𝐚𝐦𝐢𝐜 𝐃𝐚𝐭𝐞: 
-• 𝐔𝐩𝐭𝐢𝐦𝐞: 
-• 𝐃𝐚𝐭𝐚𝐛𝐚𝐬𝐞:`
-let sections = [
-  {
-    title: 'List Menu ',
-    rows: [
-      { "header": "", "title": 'Menu All', "highlight_label": 'Recommended', "description": "Menampilkan semua Fitur Menu", "id": `${_p + command} all`,},
-      { "header": "", "title": 'Menu Main', "description": "Menampilkan Menu Main", "id": `${_p + command} main` },
-      { "header": "", "title": 'Menu Download', "description": "Seluruh Fitur Download", "id": `.menu downloader` },
-      { "header": "", "title": 'Menu Sticker', "description": "Memberikan Fitur Sticker", "id": `${_p + command} sticker` },
-      { "header": "", "title": 'XP', "description": "Klaim XP", "id": `${_p + command} xp` },
-{ "header": "", "title": 'Menu Game', "description": "Seluruh Fitur Game", "id": `${_p + command} game` },
-{ "header": "", "title": 'Menu Rpg', "description": "Seluruh Fitur Game Rpg", "id": `${_p + command} rpg` },
-      { "header": "", "title": 'Menu Grup', "description": "Seluruh Fitur Group", "id": `${_p + command} group` },
-      { "header": "", "title": 'Menu Fun', "description": "Menyediakan Menu Fun", "id": `${_p + command} fun` },
-      { "header": "", "title": 'Menu Tools', "description": "Memberikan Fitur Tools", "id": `${_p + command} tools` },
-      { "header": "", "title": 'Menu Internet', "description": "Memberikan Fitur Internet", "id": `${_p + command} internet` },
-      { "header": "", "title": 'Menu Info/AI', "description": "Menyediakan Info/AI", "id": `${_p + command} info` },
-      { "header": "", "title": 'Menu Islam', "description": "Menu Islam🌜", "id": `${_p + command} islam` },
-      { "header": "", "title": 'Menu Kerang', "description": "Menu Kerang", "id": `${_p + command} kerang`},
-      { "header": "", "title": 'Menu Maker', "description": "Memberikan Menu Textpro Maker", "id": `${_p +command} maker` },
-      { "header": "", "title": 'Menu Anime', "description": "Menampilkan menu Anime", "id": `${_p + command} image` },
-      { "header": "", "title": 'Menu Owner', "description": "Khusus Untuk Owner Bot", "id": `${_p + command} owner` },
-      { "header": "", "title": 'Menu Quotes', "description": "Kumpulan Quotes Disini", "id": `${_p + command} quotes` },
-      { "header": "", "title": 'Menu Stalking', "description": "Melampirkan Menu Stalking", "id": `${_p + command} stalk` },
-      { "header": "", "title": 'Menu NSFW 🅟', "description": "KHUSUS PREMIUM", "id": `${_p + command} nsfw` },
-    ]       
-  }, {
-  'title': 'INFO BOT ',
-    rows: [
-      { "header": "", "title": 'Creator', "description": "Nomer pengembang BOT", "id": `${_p}owner` },
-      { "header": "", "title": 'Speed', "description": "menampilkan kecepatan respon BOT", "id": `${_p}ping` },
-    ]
-  }
-]
-//const fcon = { key: {participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: `status@broadcast` } : {}) }, message: { 'contactMessage': { 'displayName': `${name}`,}}}
-let media = await prepareWAMessageMedia({ image: { url: 'https://btch.pages.dev/file/115260d4449d8d98f212e.jpg' } }, { upload: conn.waUploadToServer });
-let msg2 = {
-viewOnceMessage: {
-  message: {
-    messageContextInfo: {
-      deviceListMetadata: {},
-      deviceListMetadataVersion: 2,
-    },
-    interactiveMessage: {
-      body: {
-        text: skntex,
-      },
-      footer: {
-        text: wm,
-      },
-      header: proto.Message.InteractiveMessage.Header.create({
-      ...media,
-      title: "",
-      subtitle: "",
-      hasMediaAttachment: false
-    }),
-      nativeFlowMessage: {
-        buttons: [
-          {
-          "name": "single_select",
-          "buttonParamsJson":
-JSON.stringify({
-"title": "List Menu ⎙",
-"sections": sections
-          })              
-        },
-        {
-          "name": "cta_url",
-          "buttonParamsJson": JSON.stringify({
-            display_text: "Saluran Update Bot",
-            url: 'https://whatsapp.com/channel/0029VaiSfLQGpLHU6TP4tM1O',
-            merchant_url: 'https://whatsapp.com/channel/0029VaiSfLQGpLHU6TP4tM1O'
-          })
-        },
-      ],
-      },
-      contextInfo: {
-        quotedMessage: m.message,
-        participant: m.sender,
-        ...m.key
-      }
-    },
-  },
-},
-};
-let msg = generateWAMessageFromContent(m.chat, {
-  viewOnceMessage: {
-    message: {
-        "messageContextInfo": {
-          "deviceListMetadata": {},
-          "deviceListMetadataVersion": 2
-        },
-        interactiveMessage: proto.Message.InteractiveMessage.create({
-          body: proto.Message.InteractiveMessage.Body.create({
-            text: "ɴᴀᴍᴀ ꜱᴀyᴀ ᴀᴅᴀʟᴀʜ *Kadhera*\n\nʙᴏᴛ ɪɴɪ ᴅᴀᴘᴀᴛ ᴅɪɢᴜɴᴀᴋᴀɴ sᴇʙᴀɢᴀɪ *ᴇᴅᴜᴋᴀsɪ ᴘᴇʟᴀᴊᴀʀᴀɴ*, *ᴜɴᴅᴜʜᴀɴ ᴍᴇᴅɪᴀ*, *ɢᴀᴍᴇ*, *ᴘᴇɴᴊᴀɢᴀ ɢʀᴜᴘ*, *ᴅᴀɴ ʟᴀɪɴɴʏᴀ* ʏᴀɴɢ ᴅᴀᴘᴀᴛ ᴍᴇᴍʙᴜᴀᴛ ᴋᴀᴍᴜ ʟᴇʙɪʜ ᴍᴜᴅᴀʜ ᴜɴᴛᴜᴋ ᴍᴇɴᴊᴀʟᴀɴɪ ʜᴀʀɪ-ʜᴀʀɪ.\n\n╭  ◦ ᴄʀᴇᴀᴛᴏʀ: *ᴏʀᴀɴɢ*\n╰  ◦ ᴘʀᴇғɪx: *[ . ]*\n\nᴊɪᴋᴀ ᴀᴅᴀ ᴍᴀsᴀʟᴀʜ ᴅᴀʟᴀᴍ ᴘᴇɴɢɢᴜɴᴀᴀɴ sɪʟᴀʜᴋᴀɴ ʜᴜʙᴜɴɢɪ ᴄʀᴇᴀᴛᴏʀ\n ◦ ᴍᴇɴᴀᴍᴘɪʟᴋᴀɴ ғɪᴛᴜʀ ʙᴏᴛ: *ᴘᴇɴᴄᴇᴛ ᴛᴏᴍʙᴏʟᴅɪ ʙᴀᴡᴀʜ*\n\nʜᴀʀᴀᴘ ᴜɴᴛᴜᴋ ʙᴇʀɢᴀʙᴜɴɢ ɢʀᴏᴜᴘ ʙᴏᴛ ᴀɢᴀʀ ᴍᴇɴɢᴇᴛᴀʜᴜɪ ɪɴғᴏʀᴍᴀsɪ ʙᴏᴛ ᴊɪᴋᴀ *ᴇʀʀᴏʀ/ʙᴀɴɴᴇᴅ*"
-          }),
-          footer: proto.Message.InteractiveMessage.Footer.create({
-            text: "Kadhera Button V2"
-          }),
-          header: proto.Message.InteractiveMessage.Header.create({
-            title: "Me Pianz OFC",
-            subtitle: "Kadhera_button_V2",
-            hasMediaAttachment: false
-          }),
-          nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-            buttons: [            
-              {
-                "name": "quick_reply",
-                "buttonParamsJson": "{\"display_text\":\"Tampilkan Semua Menu\",\"id\":\".allmenu\"}"
-              }, 
-{
-                "name": "quick_reply",
-                "buttonParamsJson": "{\"display_text\":\"Script By Pianz\",\"id\":\".sc\"}"
-              }, 
-              {
-                "name": "quick_reply",
-                "buttonParamsJson": "{\"display_text\":\"Bot Aktif Dalam Kurun waktu\",\"id\":\".runtime\"}"
-              }, 
-{
-                "name": "quick_reply",
-                "buttonParamsJson": "{\"display_text\":\"Info Bot\",\"id\":\".\"}"
-              },
-{
-                "name": "quick_reply",
-                "buttonParamsJson": "{\"display_text\":\"Ping\",\"id\":\".ping\"}"
-              },           
-              {
-                "name": "quick_reply",
-                "buttonParamsJson": "{\"display_text\":\"Owner Bot salsa\",\"id\":\".owner\"}"
-              },             
-           ],
-          })
-        })
-    }
-  }
-}, {})
+╭─────═[ INFO USER ]═─────⋆
+│╭───────────────···
+┴│☂︎ *Name:* %name
+⬡│☂︎ *Tag:* %tag
+⬡│☂︎ *Premium:* %prems
+⬡│☂︎ *Limit:* %limit
+┬│☂︎ *Total Xp:* %totalexp
+│╰────────────────···
+┠─────═[ TODAY ]═─────⋆
+│╭────────────────···
+┴│    *${ucapan()} %name!*
+⬡│☂︎ *Tanggal:* %week %weton
+⬡│☂︎ *Date:* %date
+⬡│☂︎ *Tanggal Islam:* %dateIslamic
+┬│☂︎ *Waktu:* %time
+│╰────────────────···
+┠─────═[ INFO BOT ]═─────⋆
+│╭────────────────···
+┴│☂︎ *Nama Bot:* %me
+⬡│☂︎ *Mode:* %mode
+⬡│☂︎ *Prefix:* [ *%_p* ]
+⬡│☂︎ *Baileys:* Multi Device
+⬡│☂︎ *Device:* %device
+⬡│☂︎ *Platform:* %platform
+⬡│☂︎ *Type:* Node.Js
+⬡│☂︎ *Uptime:* %muptime
+┬│☂︎ *Database:* %rtotalreg dari %totalreg
+│╰────────────────···
+╰──────────═┅═──────────
 
-//await conn.relayMessage(msg.key.remoteJid, msg.message, {
-  //messageId: msg.key.id
-//})
-await conn.relayMessage(m.chat, msg2, { });
+⃝▣──「 *INFO CMD* 」───⬣
+│ *Ⓟ* = Premium
+│ *Ⓛ* = Limit
+▣────────────⬣
+%readmore
+`.trimStart(),
+  header: '⃝▣──「 %category 」───⬣',
+  body: '│○ %cmd %isPremium %islimit',
+  footer: '▣───────────⬣\n',
+  after: `%c4 %me`,
+}
+let handler = async (m, { conn, usedPrefix: _p, __dirname, args, command}) => {
 let tags = {
-'reyzmenu': { }
+  'main': 'Main',
+  'game': 'Game',
+  'rpg': 'RPG Games',
+  'xp': 'Exp & Limit',
+  'sticker': 'Sticker',
+  'kerang': 'Kerang Ajaib',
+  'quotes': 'Quotes',
+  'fun': 'Fun',
+  'anime': 'Anime',
+  'admin': 'Admin',
+  'group': 'Group',
+  'vote': 'Voting',
+  'absen': 'Absen',
+  'premium': 'Premium',
+  'anonymous': 'Anonymous Chat',
+  'internet': 'Internet',
+  'downloader': 'Downloader',
+  'tools': 'Tools',
+  'nulis': 'MagerNulis & Logo',
+  'audio': 'Audio',
+  'maker': 'Maker',
+  'database': 'Database',
+  'quran': 'Al Qur\'an',
+  'owner': 'Owner',
+  'host': 'Host',
+  'advanced': 'Advanced',
+  'info': 'Info',
+  '': 'No Category',
 }
  
-  /*try {
+  try {
   	// DEFAULT MENU
       let dash = global.dashmenu
   	let m1 = global.dmenut
@@ -185,11 +99,12 @@ let tags = {
       let c2 = global.cmenub
       let c3 = global.cmenuf
       let c4 = global.cmenua
-      */
+      
       // LOGO L P
       let lprem = global.lopr
       let llim = global.lolm
       let tag = `@${m.sender.split('@')[0]}`
+      let device = await getDevice(m.id) 
     
     //-----------TIME---------
     let ucpn = `${ucapan()}`
@@ -201,7 +116,7 @@ let tags = {
       month: 'long',
       year: 'numeric'
     })
-   //let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender
+    let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender
     // d.getTimeZoneOffset()
     // Offset -420 is 18.00
     // Offset    0 is  0.00
@@ -226,9 +141,6 @@ let tags = {
         setTimeout(resolve, 1000)
       }) * 1000
     }
-    let totalf = Object.values(global.plugins).filter(
-    (v) => v.help && v.tags
-  ).length
     let muptime = clockString(_muptime)
     let uptime = clockString(_uptime)
     let _mpt
@@ -241,8 +153,10 @@ let tags = {
     }
     let mpt = clockString(_mpt)
     let usrs = db.data.users[m.sender]
-      
-    let wib = moment.tz('Asia/Jakarta').format('HH:mm:ss')
+   
+
+ /**************************** TIME *********************/
+ let wib = moment.tz('Asia/Jakarta').format('HH:mm:ss')
     let wibh = moment.tz('Asia/Jakarta').format('HH')
     let wibm = moment.tz('Asia/Jakarta').format('mm')
     let wibs = moment.tz('Asia/Jakarta').format('ss')
@@ -250,16 +164,15 @@ let tags = {
     let wita = moment.tz('Asia/Makassar').format('HH:mm:ss')
     let wktuwib = `${wibh} H ${wibm} M ${wibs} S`
  
-    let mode = global.opts['self'] ? 'Private' : 'Publik'
+ let mode = global.opts['self'] ? 'Private' : 'Publik'
     let _package = JSON.parse(await promises.readFile(join(__dirname, '../package.json')).catch(_ => ({}))) || {}
-    let { age, exp, limit, level, role, registered, eris} = global.db.data.users[m.sender]
+    let { age, exp, limit, level, role, registered, money} = global.db.data.users[m.sender]
     let { min, xp, max } = xpRange(level, global.multiplier)
     let name = await conn.getName(m.sender)
     let premium = global.db.data.users[m.sender].premiumTime
     let prems = `${premium > 0 ? 'Premium': 'Free'}`
     let platform = os.platform()
     
-    let bjir = 'https://telegra.ph/file/b7e407a6472f01eedced5.jpg'
     //---------------------
     
     let totalreg = Object.keys(global.db.data.users).length
@@ -282,7 +195,6 @@ let tags = {
           if (plugin.help) groups[tag].push(plugin)
           }
     conn.menu = conn.menu ? conn.menu : {}
-    let fitur = Object.values(plugins).filter(v => v.help && !v.disabled).map(v => v.help).flat(1)
     let before = conn.menu.before || defaultMenu.before
     let header = conn.menu.header || defaultMenu.header
     let body = conn.menu.body || defaultMenu.body
@@ -318,38 +230,179 @@ let tags = {
       totalexp: exp,
       xp4levelup: max - exp,
       github: _package.homepage ? _package.homepage.url || _package.homepage : '[unknown github url]',
-      //tag, dash,m1,m2,m3,m4,cc, c1, c2, c3, c4,lprem,llim,
-      ucpn,platform, wib, mode, _p, eris, age, tag, name, prems, level, limit, name, weton, week, date, dateIslamic, time, totalreg, rtotalreg, role,
+      tag, dash,m1,m2,m3,m4,cc, c1, c2, c3, c4,lprem,llim,
+      ucpn,platform, wib, mode, _p, money, age, tag, device, name, prems, level, limit, name, weton, week, date, dateIslamic, time, totalreg, rtotalreg, role,
       readmore: readMore
     }
     text = text.replace(new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join`|`})`, 'g'), (_, name) => '' + replace[name])
     
+    //----------------- FAKE
+ let fvn = {quoted: { key: {participant : '0@s.whatsapp.net'},message: { "audioMessage": {"mimetype":"audio/ogg; codecs=opus","seconds": "2022","ptt": "true"} } }}
+ let floc = {quoted: { key: { participant : '0@s.whatsapp.net'}, message: { "liveLocationMessage": { "caption": `Menu`,"h": `${name}`, 'jpegThumbnail': fs.readFileSync('./thumbnail.jpg')}} }}
+ let fdocs = {quoted: { key : { participant : '0@s.whatsapp.net'},message: {documentMessage: {title: `Hai Kak ${name}!`,  jpegThumbnail: fs.readFileSync('./thumbnail.jpg') }}}}
+ let fgclink = {quoted: {key: {participant : '0@s.whatsapp.net'},message: {groupInviteMessage: {groupJid: "17608914335-1625305606@g.us",inviteCode: null,groupName: `Hai ${name}!`,  caption: wm,  jpegThumbnail: fs.readFileSync('./thumbnail.jpg') }} }}
+ let fgif = {quoted: {key: { participant : '0@s.whatsapp.net'}, message: {  "videoMessage": {  "title": `Hai Kak ${name}!`, "h": `Hmm`, 'seconds': '999999999',  'gifPlayback': 'true',  'caption': wm, 'jpegThumbnail': fs.readFileSync('./thumbnail.jpg') } } } }
  let fkon = { key: { fromMe: false, participant: `${m.sender.split`@`[0]}@s.whatsapp.net`, ...(m.chat ? { remoteJid: '16504228206@s.whatsapp.net' } : {}) }, message: { contactMessage: { displayName: `${name}`, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:${name}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`}}}
+ 
+    let ftoko = {
+    key: {
+    fromMe: false,
+    participant: `${m.sender.split`@`[0]}` + '@s.whatsapp.net',
+    remoteJid: 'status@broadcast',
+  },
+  message: {
+  "productMessage": {
+  "product": {
+  "productImage":{
+  "mimetype": "image/jpeg",
+  "jpegThumbnail": fs.readFileSync('./thumbnail.jpg'),
+    },
+  "title": `${ucapan()}`,
+  "description": '𝗧 𝗜 𝗠 𝗘 : ' + wktuwib,
+  "currencyCode": "US",
+  "priceAmount1000": "100",
+  "retailerId": wm,
+  "productImageCount": 999
+        },
+  "businessOwnerJid": `${m.sender.split`@`[0]}@s.whatsapp.net`
+  }
+  }
+  }
+  
+    let urls = pickRandom(['https://telegra.ph/file/035e524939ab0294ba91f.jpg', 'https://telegra.ph/file/96b2275d3b14d071290bc.jpg', 'https://telegra.ph/file/2c6b7660bc6126404a9bb.jpg', 'https://telegra.ph/file/c635bf577bb9d59a3e00b.jpg', 'https://telegra.ph/file/be8dd52f6363f9e9f5a60.jpg', 'https://telegra.ph/file/02e53361b9dc946f63c8d.jpg', 'https://telegra.ph/file/298ed2f1bba17aeb64ca8.jpg', 'https://telegra.ph/file/be2a18221974147f66ea0.jpg'])
+    const pp = await conn.profilePictureUrl(conn.user.jid).catch(_ => 'https://telegra.ph/file/24fa902ead26340f3df2c.png')
+    
+    //FAKE TROLI
 
-let p = await new canvafy.Security()
-. setAvatar (pp)
-. setBackground ("color","#FF0033")
-. setLocale ("id")
-. setOverlayOpacity (1.0)
-. setAvatarBorder ("#fff")
-   .setCreatedTimestamp(Date.now())
-        .setSuspectTimestamp(1)
-.build()
+    const ftrol = {
+    key : {
+    remoteJid: 'status@broadcast',
+    participant : '0@s.whatsapp.net'
+    },
+    message: {
+    orderMessage: {
+    itemCount : 2022,
+    status: 1,
+    surface : 1,
+    message: `Hai Kak ${name}!`, 
+    orderTitle: `▮Menu ▸`,
+    thumbnail: await (await fetch(flaaa + 'Menu')).buffer(), //Gambarnye
+    sellerJid: '0@s.whatsapp.net' 
+    }
+    }
+    }
+    
+    const fload = {
+    key : {
+    remoteJid: 'status@broadcast',
+    participant : '0@s.whatsapp.net'
+    },
+    message: {
+    orderMessage: {
+    itemCount : 2022,
+    status: 1,
+    surface : 1,
+    message: '[❗] Memuat Menu ' + '...\n Sabar Ya Kak ^ω^', 
+    orderTitle: `▮Menu ▸`,
+    thumbnail: await (await fetch(flaaa + 'Loading')).buffer(), //Gambarnye
+    sellerJid: '0@s.whatsapp.net' 
+    }
+    }
+    }
+    await conn.reply(m.chat, '*Tunggu Sebentar Kak. . .*', m)
+    
+    //------------------< MENU >----------------
+    
+    //------------------ SIMPLE
+    /*conn.reply(m.chat, text, fkon, { contextInfo: { mentionedJid: [m.sender],
+        externalAdReply: {
+            title: `${htjava} ${namebot}`,
+            body: titlebot,
+            description: titlebot,
+            mediaType: 2,
+          thumbnail: await(await fetch(thumb2)).buffer(),
+         mediaUrl: sig
+        }
+     }
+    })*/
+    
+    //------------------ DOCUMENT
+    let d1 = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    let d2 = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    let d3  = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    let d4 = 'application/pdf'
+    let d5 = 'application/vnd.android.package-archive'
+    let d6 = 'application/zip'
+    let td = `${pickRandom([d1,d2,d3,d4,d5,d6])}`
+    
+   //~~~Source : https://github.com/Rlxfly
+    //------- MENU LOCATION
+    /*const pre = generateWAMessageFromContent(m.chat, { liveLocationMessage:{
+  degreesLatitude: 34.672314,
+  degreesLongitude: 135.484802,
+  accuracyInMeters: 100,
+  speedInMps: 999,
+  degreesClockwiseFromMagneticNorth: 99,
+  caption: text.trim(),
+  sequenceNumber: 774236889,
+  timeOffset: 8600,
+  jpegThumbnail: await(await fetch(thumb)).buffer(),
+  contextInfo: { mentionedJid: [m.sender] }
+}}, { quoted: m
+					})
 
-let delay = time => new Promise(res => setTimeout(res, time))
-let elaina = {
-                 audio:fs.readFileSync('./vn/menuawal.mp3'),mimetype:'audio/mpeg',ptt:true,viewOnce:false,thumbnaiUrl:thumb
-                    
-                    
-                }
-            await delay(1000)              
-            conn.sendMessage(m.chat, elaina,{ quoted: m })
-}               
-handler.help = ['menu']
+return conn.relayMessage(m.chat, pre.message, { messageId: pre.key.id })*/
+
+    //------------------- Payment MENU
+    /*await conn.relayMessage(m.chat,  {
+    requestPaymentMessage: {
+      currencyCodeIso4217: 'USD',
+      amount1000: 50000000,
+      requestFrom: m.sender,
+      noteMessage: {
+      extendedTextMessage: {
+      text: text.trim(),
+      contextInfo: {
+      externalAdReply: {
+      showAdAttribution: true
+      }}}}}}, {})*/
+      
+
+    //------------------ DOCUMENT WITH EXTERNALADS WITHOUT BUTTON
+     return conn.sendMessage(m.chat, {
+            document: { url: sgh},
+            fileName: global.namedoc, 
+            mimetype: global.doc, 
+            fileLength: fsizedoc,
+            pageCount: fpagedoc, 
+            caption: text.trim(), 
+            contextInfo: {
+              mentionedJid:[m.sender], 
+              forwardingScore: '9999999',
+              externalAdReply: {
+                mediaType: 1,
+                previewType:"pdf", 
+                renderLargerThumbnail: true,
+                showAdAttribution: true,
+                sourceUrl: global.social, 
+                thumbnail:fs.readFileSync('./thumbnail.jpg'),
+                title:'ʜᴏᴡ ᴀʀᴇ ʏᴏᴜ ᴛᴏᴅᴀʏ?', 
+              },
+            },
+          }, { quoted: m })
+    
+  } catch (e) {
+    conn.reply(m.chat, 'Maaf, menu sedang error', m)
+    throw e
+  }
+}
+
+handler.help = ['menu','allmenu', 'help', '?']
 handler.tags = ['main']
-handler.command = /^(menu|help)$/i
+handler.command = /^(menu|allmenu|help|\?)$/i
 
 handler.register = false
+handler.exp = 10
 
 export default handler
 
@@ -379,18 +432,18 @@ function clockStringP(ms) {
 }
 function ucapan() {
   const time = moment.tz('Asia/Jakarta').format('HH')
-  let res = "ᴋᴏᴋ ʙᴇʟᴜᴍ ᴛɪᴅᴜʀ ᴋᴀᴋ? 🥱"
+  let res = "Kok Belum Tidur Kak? 🥱"
   if (time >= 4) {
-    res = "ᴘᴀɢɪ ᴋᴀᴋ 🌄"
+    res = "Pagi Lord 🌄"
   }
   if (time >= 10) {
-    res = "sɪᴀɴɢ ᴋᴀᴋ ☀️"
+    res = "Siang Lord ☀️"
   }
   if (time >= 15) {
-    res = "sᴏʀᴇ ᴋᴀᴋ 🌇"
+    res = "Sore Lord 🌇"
   }
   if (time >= 18) {
-    res = "ᴍᴀʟᴀᴍ ᴋᴀᴋ 🌙"
+    res = "Malam Lord 🌙"
   }
   return res
 }

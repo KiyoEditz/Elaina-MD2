@@ -8,7 +8,9 @@
   Regards from YanXiao ♡
 */
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '1';
+
 import './config.js'
 
 import path, { join } from 'path'
@@ -24,7 +26,11 @@ import {
     readFileSync,
     watch
 } from 'fs'
-import yargs from 'yargs'
+
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
+const argv = yargs(hideBin(process.argv)).argv;
+
 import { spawn } from 'child_process'
 import lodash from 'lodash'
 import syntaxerror from 'syntax-error'
@@ -109,15 +115,14 @@ var question = function(text) {
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 
 const { version, isLatest} = await fetchLatestBaileysVersion()
-const { state, saveCreds } = await useMultiFileAuthState('./session')
-console.log(`using WA v${version.join('.')}, isLatest: ${isLatest}`)
+const { state, saveCreds } = await useMultiFileAuthState('./sessions')
 const connectionOptions = {
         version,
         logger: pino({ level: 'silent' }), 
         printQRInTerminal: !usePairingCode, 
 	// Optional If Linked Device Could'nt Connected
 	// browser: ['Mac OS', 'chrome', '125.0.6422.53']
-        browser: ['Elaina-MD2', 'safari', '5.1.10'],
+        browser: ['Mac OS', 'safari', '5.1.10'],
         auth: { 
          creds: state.creds, 
          keys: makeCacheableSignalKeyStore(state.keys, pino().child({ 
@@ -161,7 +166,7 @@ conn.isInit = false
 if(usePairingCode && !conn.authState.creds.registered) {
 		if(useMobile) throw new Error('Cannot use pairing code with mobile api')
 		const { registration } = { registration: {} }
-		let phoneNumber = '6285874068202'
+		let phoneNumber = ''
 		do {
 			phoneNumber = await question(chalk.blueBright('Input a Valid number start with region code. Example : 62xxx:\n'))
 		} while (!Object.keys(PHONENUMBER_MCC).some(v => phoneNumber.startsWith(v)))
@@ -174,6 +179,25 @@ if(usePairingCode && !conn.authState.creds.registered) {
 			console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
 		}, 3000)
 	}
+async function resetLimit() {
+  try {
+    let list = Object.entries(global.db.data.users);
+    let lim = 25; // Nilai limit default yang ingin di-reset
+
+    list.map(([user, data], i) => {
+      // Hanya reset limit jika limit saat ini <= 25
+      if (data.limit <= lim) {
+        data.limit = lim;
+      }
+    });
+
+    // logs bahwa reset limit telah sukses
+    console.log(`Success Auto Reset Limit`) 
+  } finally {
+    // Setel ulang fungsi reset setiap 24 jam (1 hari)
+    setInterval(() => resetLimit(), 1 * 86400000);
+  }
+}
 
 if (!opts['test']) {
   (await import('./server.js')).default(PORT)
@@ -196,7 +220,7 @@ function clearTmp() {
   })
 }
 
-async function clearSessions(folder = './session') {
+async function clearSessions(folder = './sessions') {
   try {
     const filenames = await readdirSync(folder);
     const deletedFiles = await Promise.all(filenames.map(async (file) => {
@@ -245,7 +269,7 @@ async function connectionUpdate(update) {
     }
 
     if (connection == 'close') {
-        console.log(chalk.red('⏱️ koneksi terputus & mencoba menyambung ulang...'));
+        console.log(chalk.red('⏱️ Koneksi terputus & mencoba menyambung ulang...'));
     }
 
     global.timestamp.connect = new Date;
@@ -293,13 +317,12 @@ global.reloadHandler = async function (restatConn) {
     conn.ev.off('creds.update', conn.credsUpdate)
   }
 
-  conn.welcome = 'Hai, @user!\nSelamat datang di grup @subject\n\n@desc'
-  conn.bye = 'Selamat tinggal @user!'
-  conn.spromote = '@user telah diangkat menjadi admin group!\n\n_Congratss_'
-  conn.sdemote = '@user sekarang bukan lagi admin group!\n\n_Sad :(_'
-  conn.readmore = readMore
-  conn.sDesc = 'Deskripsi telah diubah ke \n@desc'
-  conn.sSubject = 'Judul grup telah diubah ke \n@subject'
+  conn.welcome = '❖━━━━━━[ Selamat Datang ]━━━━━━❖\n\n┏––––––━━━━━━━━•\n│☘︎ @subject\n┣━━━━━━━━┅┅┅\n│( 👋 Hallo @user)\n├[ Intro ]—\n│ NAMA: \n│ USIA: \n│ JENIS KELAMIN:\n┗––––––━━┅┅┅\n\n––––––┅┅ DESKRIPSI ┅┅––––––\n@desc'
+  conn.bye = '❖━━━━━━[ Meninggalkan ]━━━━━━❖\n𝚂𝚊𝚢𝚘𝚗𝚊𝚛𝚊𝚊 @user 👋😃'
+  conn.spromote = '@user Sekarang jadi admin!'
+  conn.sdemote = '@user Sekarang bukan lagi admin!'
+  conn.sDesc = 'Deskripsi telah diubah menjadi \n@desc'
+  conn.sSubject = 'Judul grup telah diubah menjadi \n@subject'
   conn.sIcon = 'Icon grup telah diubah!'
   conn.sRevoke = 'Link group telah diubah ke \n@revoke'
   conn.sAnnounceOn = 'Group telah di tutup!\nsekarang hanya admin yang dapat mengirim pesan.'
@@ -386,16 +409,18 @@ async function _quickTest() {
         return Promise.race([
             new Promise(resolve => {
                 p.on('close', code => {
-                    resolve(code !== 127)
-                })
+                    resolve(code !== 127);
+                });
             }),
             new Promise(resolve => {
-                p.on('error', _ => resolve(false))
+                p.on('error', _ => resolve(false));
             })
-        ])
-    }))
-    let [ffmpeg, ffprobe, ffmpegWebp, convert, magick, gm, find] = test
-    console.log(test)
+        ]);
+    }));
+
+    let [ffmpeg, ffprobe, ffmpegWebp, convert, magick, gm, find] = test;
+    console.log(test);
+
     let s = global.support = {
         ffmpeg,
         ffprobe,
@@ -404,23 +429,23 @@ async function _quickTest() {
         magick,
         gm,
         find
-    }
-    // require('./lib/sticker').support = s
-    Object.freeze(global.support)
+    };
+
+    Object.freeze(global.support);
 
     if (!s.ffmpeg) {
-        conn.logger.warn(`Silahkan install ffmpeg terlebih dahulu agar bisa mengirim video`)
+        conn.logger.warn(`Silahkan install ffmpeg terlebih dahulu agar bisa mengirim video`);
     }
 
     if (s.ffmpeg && !s.ffmpegWebp) {
-        conn.logger.warn('Sticker Mungkin Tidak Beranimasi tanpa libwebp di ffmpeg (--enable-ibwebp while compiling ffmpeg)')
+        conn.logger.warn('Sticker Mungkin Tidak Beranimasi tanpa libwebp di ffmpeg (--enable-libwebp while compiling ffmpeg)');
     }
 
     if (!s.convert && !s.magick && !s.gm) {
-        conn.logger.warn('Fitur Stiker Mungkin Tidak Bekerja Tanpa imagemagick dan libwebp di ffmpeg belum terinstall (pkg install imagemagick)')
+        conn.logger.warn('Fitur Stiker Mungkin Tidak Bekerja Tanpa imagemagick dan libwebp di ffmpeg belum terinstall (pkg install imagemagick)');
     }
-
 }
+
 _quickTest()
-    .then(() => conn.logger.info('Quick Test Done , nama file session ~> creds.json'))
-    .catch(console.error)
+    .then(() => conn.logger.info('☑️ Quick Test Done , nama file session ~> creds.json'))
+    .catch(console.error);
