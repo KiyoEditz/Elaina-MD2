@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+sessions
+tmp
+.git
+.gitignore
+.eslint*

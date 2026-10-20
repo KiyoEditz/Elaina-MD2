@@ -1,15 +1,14 @@
-version: "3.9" 
 services:
-  web:
+  elaina-bot:
     build: .
-    ports:
-      - "8000:5000"
+    container_name: elaina-bot
+    restart: unless-stopped
+    stdin_open: true # needed for interactive terminal / pairing
+    tty: true
     volumes:
-      - .:/code
-      - logvolume01:/var/log
-    links:
-      - redis
-  redis:
-    image: redis
-volumes:
-  logvolume01: {}
+      - ./sessions:/app/sessions
+      - ./data:/app/data
+      - ./tmp:/app/tmp
+    environment:
+      - NODE_ENV=production
+      - TZ=Asia/Jakarta

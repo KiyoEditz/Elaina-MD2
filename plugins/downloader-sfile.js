@@ -1,45 +1,86 @@
-import * as cheerio from 'cheerio'
-import fetch from 'node-fetch'
+import fetch from 'node-fetch';
+import * as cheerio from 'cheerio';
 
-let handler = async (m, { conn, text }) => {
-	if (text.match(/(https:\/\/sfile.mobi\/)/gi)) {
-		let res = await sfileDl(text)
-		if (!res) throw 'Tidak Dapat Mengunduh File'
-		await m.reply(Object.keys(res).map(v => `*• ${v.capitalize()}:* ${res[v]}`).join('\n') + '\n\n_Sending file..._')
-		conn.sendMessage(m.chat, { document: { url: res.download }, fileName: res.filename, mimetype: res.mimetype }, { quoted: m })
-	} else if (text) {
-		let [query, page] = text.split`|`
-		let res = await sfileSearch(query, page)
-		if (!res.length) throw `Query "${text}" not found :/`
-		res = res.map((v) => `*Title:* ${v.title}\n*Size:* ${v.size}\n*Link:* ${v.link}`).join`\n\n`
-		m.reply(res)
-	} else throw 'Input Query / Sfile Url!'
-}
-handler.help = ['sfile']
-handler.tags = ['downloader']
-handler.command = /^(sfile)$/i
+const handler = async (m, { conn, text, usedPrefix, command }) => {
+  if (!text) {
+    return m.reply(`Format salah!\nGunakan:\n• ${usedPrefix + command} search <query>|<halaman>\n• ${usedPrefix + command} down <url>\n\nContoh:\n• ${usedPrefix + command} search naruto|2\n• ${usedPrefix + command} down https://sfile.mobi/xxxxx`);
+  }
 
-export default handler
+  let [mode, ...rest] = text.trim().split(' ');
+  let param = rest.join(' ').trim();
 
-async function sfileSearch(query, page = 1) {
-	let res = await fetch(`https://sfile.mobi/search.php?q=${query}&page=${page}`)
-	let $ = cheerio.load(await res.text())
-	let result = []
-	$('div.list').each(function () {
-		let title = $(this).find('a').text()
-		let size = $(this).text().trim().split('(')[1]
-		let link = $(this).find('a').attr('href')
-		if (link) result.push({ title, size: size.replace(')', ''), link })
-	})
-	return result
-}
+  if (mode.toLowerCase() === 'search') {
+    try {
+      let [query, page] = param.split('|');
+      query = query?.trim();
+      page = parseInt(page) || 1;
 
-async function sfileDl(url) {
-	let res = await fetch(url)
-	let $ = cheerio.load(await res.text())
-	let filename = $('div.w3-row-padding').find('img').attr('alt')
-	let mimetype = $('div.list').text().split(' - ')[1].split('\n')[0]
-	let filesize = $('#download').text().replace(/Download File/g, '').replace(/\(|\)/g, '').trim()
-	let download = $('#download').attr('href') + '&k=' + Math.floor(Math.random() * (15 - 10 + 1) + 10)
-	return { filename, filesize, mimetype, download }
-}
+      let res = await fetch(`https://sfile.mobi/search.php?q=${encodeURIComponent(query)}&page=${page}`);
+      let $ = cheerio.load(await res.text());
+
+      let result = [];
+      $('div.list').each(function () {
+        let title = $(this).find('a').text();
+        let size = $(this).text().trim().split('(')[1];
+        let link = $(this).find('a').attr('href');
+        if (link) result.push({ title, size: size?.replace(')', ''), link });
+      });
+
+      if (!result.length) return m.reply(`🔍 Tidak ditemukan hasil untuk "${query}"`);
+
+      let caption = result.map((v, i) => {
+        return `📌 *Result ${i + 1}*\n🔖 *Title:* ${v.title}\n📦 *Size:* ${v.size}\n🔗 *Link:* ${v.link}`;
+      }).join('\n\n━━━━━━━━━━━━━━━\n\n');
+
+      m.reply(`🔎 *Hasil Pencarian untuk "${query}"*\n\n${caption}\n\n📝 Halaman: ${page}`);
+    } catch (e) {
+      console.error(e);
+      m.reply('Terjadi kesalahan saat mencari file.');
+    }
+
+  } else if (mode.toLowerCase() === 'down') {
+    if (!/^https:\/\/sfile\.mobi\//i.test(param)) return m.reply('Link tidak valid. Harus diawali https://sfile.mobi/');
+
+    try {
+      let res = await fetch(param);
+      let $ = cheerio.load(await res.text());
+
+      let filename = $('img.intro').attr('alt') || 'download_file';
+      let mimetype = $('div.list').text().split(' - ')[1]?.split('\n')[0]?.trim() || 'application/octet-stream';
+      let downloadPage = $('#download').attr('href');
+      let up_at = $('.list').eq(2).text().split(':')[1]?.trim() || '-';
+      let uploader = $('.list').eq(1).find('a').eq(0).text().trim() || '-';
+      let total_down = $('.list').eq(3).text().split(':')[1]?.trim() || '-';
+
+      if (!downloadPage) return m.reply('Tautan unduhan tidak ditemukan di halaman ini.');
+
+      let data = await fetch(downloadPage);
+      let $$ = cheerio.load(await data.text());
+      let scriptText = $$('script').text();
+      let downloadUrl = scriptText.split('sf = "')[1]?.split('"')[0]?.replace(/\\/g, '');
+
+      if (!downloadUrl) return m.reply('Gagal mengambil tautan unduhan.');
+
+      const buff = Buffer.from(await (await fetch(downloadUrl)).arrayBuffer());
+
+      await conn.sendMessage(m.chat, {
+        document: buff,
+        fileName: filename,
+        mimetype: mimetype,
+        caption: `📁 *File Information*\n\n🔹 *Filename:* ${filename}\n🔹 *Mimetype:* ${mimetype}\n🔹 *Uploader:* ${uploader}\n🔹 *Upload Date:* ${up_at}\n🔹 *Downloads:* ${total_down}`
+      }, { quoted: m });
+    } catch (e) {
+      console.error(e);
+      m.reply('Terjadi kesalahan saat mengunduh file.');
+    }
+
+  } else {
+    m.reply(`Sub-command tidak dikenali.\nGunakan:\n• ${usedPrefix + command} search <query>|<halaman>\n• ${usedPrefix + command} down <url>`);
+  }
+};
+
+handler.help = ['sfile search <query>|<halaman>', 'sfile down <url>'];
+handler.tags = ['downloader'];
+handler.command = /^sfile$/i;
+
+export default handler;

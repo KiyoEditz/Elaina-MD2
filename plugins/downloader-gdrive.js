@@ -1,44 +1,62 @@
-import fetch from 'node-fetch'
-import { sizeFormatter } from 'human-readable'
-let formatSize = sizeFormatter({
-	std: 'JEDEC', decimalPlaces: 2, keepTrailingZeroes: false, render: (literal, symbol) => `${literal} ${symbol}B`
-})
+import axios from 'axios';
+import { writeFileSync } from 'fs';
+import { tmpdir } from 'os';
+import path from 'path';
 
-let handler = async (m, { conn, args }) => {
-	if (!args[0]) throw 'Input URL' 
-	GDriveDl(args[0]).then(async (res) => {
-		if (!res) throw res
-		await m.reply(JSON.stringify(res, null, 2))
-		conn.sendMessage(m.chat, { document: { url: res.downloadUrl }, fileName: res.fileName, mimetype: res.mimetype }, { quoted: m })
-	})
+let handler = async (m, { args, usedPrefix, command, conn }) => {
+  const url = args[0];
+  if (!url) throw `Contoh: ${usedPrefix + command} https://drive.google.com/file/d/xxxxxxxxx/view`;
+
+  const fileId = await extractGDrive(url);
+  if (!fileId) throw 'URL Google Drive tidak valid!';
+
+  try {
+    const apiKey = 'AIzaSyAA9ERw-9LZVEohRYtCWka_TQc6oXmvcVU';
+    const metaUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?fields=name,size,mimeType&key=${apiKey}`;
+    const downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
+
+    const metadata = await axios.get(metaUrl);
+    const { name, size, mimeType } = metadata.data;
+
+    m.reply(`Mendownload file...\n\n• Nama: ${name}\n• Ukuran: ${await formatSize(size)}\n• Tipe: ${mimeType}`);
+
+    const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
+
+    if (res.status !== 200) {
+      throw `Gagal mengunduh file: ${res.status} ${res.statusText}`;
+    }
+
+    const buffer = Buffer.from(res.data, 'binary');
+    const tmpPath = path.join(tmpdir(), name);
+    writeFileSync(tmpPath, buffer);
+
+    await conn.sendMessage(m.chat, {
+      document: { url: tmpPath },
+      fileName: name,
+      mimetype: mimeType || 'application/octet-stream',
+      caption: `File berhasil diunduh!\n\n• Nama: ${name}\n• Ukuran: ${await formatSize(size)}`
+    }, { quoted: m });
+
+  } catch (err) {
+    console.error(err);
+    throw typeof err === 'string' ? err : `Terjadi kesalahan: ${err.response?.status || err.message} ${err.response?.statusText || ''}`;
+  }
+};
+
+handler.help = ['gdrive <url>'];
+handler.tags = ['downloader'];
+handler.command = /^gdrive$/i;
+
+export default handler;
+
+async function extractGDrive(url) {
+  const match = url.match(/\/d\/([^/]+)|open\?id=([^&]+)/);
+  return match ? (match[1] || match[2]) : null;
 }
-handler.help = ['gdrive'].map(v => v + ' <url>')
-handler.tags = ['downloader']
-handler.command = /^gd(rive(d(own(load(er)?)?|l))?|dle|l)$/i
 
-export default handler
-
-async function GDriveDl(url) {
-	let id
-	if (!(url && url.match(/drive\.google/i))) throw 'Invalid URL'
-	id = (url.match(/\/?id=(.+)/i) || url.match(/\/d\/(.*?)\//))[1]
-	if (!id) throw 'ID Not Found'
-	let res = await fetch(`https://drive.google.com/uc?id=${id}&authuser=0&export=download`, {
-		method: 'post',
-		headers: {
-			'accept-encoding': 'gzip, deflate, br',
-			'content-length': 0,
-			'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-			'origin': 'https://drive.google.com',
-			'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
-			'x-client-data': 'CKG1yQEIkbbJAQiitskBCMS2yQEIqZ3KAQioo8oBGLeYygE=',
-			'x-drive-first-party': 'DriveWebUi',
-			'x-json-requested': 'true' 
-		}
-	})
-	let { fileName, sizeBytes, downloadUrl } =  JSON.parse((await res.text()).slice(4))
-	if (!downloadUrl) throw 'Link Download Limit!'
-	let data = await fetch(downloadUrl)
-	if (data.status !== 200) throw data.statusText
-	return { downloadUrl, fileName, fileSize: formatSize(sizeBytes), mimetype: data.headers.get('content-type') }
+async function formatSize(bytes) {
+  if (!bytes) return '0 B';
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
 }

@@ -1,8 +1,7 @@
-import { addExif } from '../lib/sticker.js'
-
+import { addExif } from '../lib/sticker.js';
 
 let handler = async (m, { conn, text }) => {
-  if (!m.quoted) throw 'Quoted the sticker!'
+  if (!m.quoted) throw 'reply a sticker!'
   let stiker = false
   try {
     let [packname, ...author] = text.split('|')
@@ -20,8 +19,9 @@ let handler = async (m, { conn, text }) => {
     else throw 'Conversion failed'
   }
 }
-handler.help = ['wm <packname>|<author>']
-handler.tags = ['sticker']
+handler.help = ['wm <packname|author>']
+handler.tags = ['stickerprems', 'premium']
 handler.command = /^wm$/i
+handler.limit = true
 
-export default handler
+export default handler;

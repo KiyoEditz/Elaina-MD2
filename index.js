@@ -1,79 +1,86 @@
-import yargs from 'yargs';
-import cfonts from 'cfonts';
-import { fileURLToPath } from 'url';
+console.log('🐾 Starting...');
+
+import { Worker } from 'worker_threads';
 import { join, dirname } from 'path';
-import { createRequire } from 'module';
-import { createInterface } from 'readline';
-import { setupMaster, fork } from 'cluster';
+import { fileURLToPath } from 'url';
 import { watchFile, unwatchFile } from 'fs';
+import readline from 'readline';
 
-// Setup console output
-const { say } = cfonts;
-const rl = createInterface(process.stdin, process.stdout);
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const require = createRequire(__dirname);
-const { name, author } = require(join(__dirname, './package.json'));
+const rl = readline.createInterface(process.stdin, process.stdout);
 
-say('Lightweight\nWhatsApp Bot', { font: 'chrome', align: 'center', gradient: ['red', 'magenta'] });
-say(`'${name}' By @${author.name || author}`, { font: 'console', align: 'center', gradient: ['red', 'magenta'] });
+let worker = null;
+let running = false;
+let restartTimer = null;
 
-console.log('🐾 Starting...'); 
-
-var isRunning = false;
-
-/**
- * Start a js file
- * @param {String} file `path/to/file`
- */
 function start(file) {
-  if (isRunning) return;
-  isRunning = true;
+	if (running) return;
+	running = true;
+	const full = join(__dirname, file);
 
-  let args = [join(__dirname, file), ...process.argv.slice(2)];
-  say([process.argv[0], ...args].join(' '), { font: 'console', align: 'center', gradient: ['red', 'magenta'] });
-  
-  setupMaster({ exec: args[0], args: args.slice(1) });
-  let p = fork();
+	if (worker) worker.terminate();
+	worker = new Worker(full);
+	if (restartTimer) {
+		clearTimeout(restartTimer);
+		restartTimer = null;
+	}
 
-  p.on('message', data => {
-    console.log('[✅RECEIVED]', data);
-    switch (data) {
-      case 'reset':
-        p.kill(); // Change here
-        isRunning = false;
-        start(file);
-        break;
-      case 'uptime':
-        p.send(process.uptime());
-        break;
-      default:
-          console.warn('[⚠️ UNRECOGNIZED MESSAGE]', data);
-    }
-  });
+	worker.on('message', (msg) => {
+		console.log('[MESSAGE]', msg);
 
-  p.on('exit', (_, code) => {
-    isRunning = false;
-    console.error('[❗] Exited with code:', code);
-    if (code !== 0) {
-      console.log('[🔄 Restarting worker due to non-zero exit code...');
-      return start(file);
-    }
-    
-    watchFile(args[0], () => {
-      unwatchFile(args[0]);
-      start(file);
-    });
-  });
+		if (msg === 'restart' || msg === 'reset') {
+			restart();
+		}
+	});
 
-  let opts = yargs(process.argv.slice(2)).exitProcess(false).parse();
-  
-  if (!opts['test']) {
-    if (!rl.listenerCount()) {
-      rl.on('line', line => {
-        p.emit('message', line.trim());
-      });
-    }
-  }
+	worker.on('exit', (code) => {
+		console.log('❗ Worker exited with code', code);
+		running = false;
+		if (code !== 0) {
+			restartTimer = setTimeout(
+				() => {
+					console.log('⏳ Auto restart...');
+					restart();
+				},
+				30 * 60 * 1000
+			);
+		}
+		watchFile(full, () => {
+			unwatchFile(full);
+			console.log('♻️ File updated → Restarting...');
+			start(file);
+		});
+	});
+
+	if (!rl.listenerCount('line')) {
+		rl.on('line', (line) => {
+			const cmd = line.trim().toLowerCase();
+			if (!cmd) return;
+
+			if (cmd === 'exit') {
+				console.log('⛔ Exiting...');
+				worker?.terminate();
+				process.exit(0);
+			}
+			if (cmd === 'restart' || cmd === 'reset') {
+				console.log('🍃Restart...');
+				restart();
+			}
+
+			worker?.postMessage(cmd);
+		});
+	}
+}
+
+function restart() {
+	if (worker) {
+		try {
+			worker.terminate();
+		} catch {}
+	}
+	running = false;
+
+	start('main.js');
 }
 
 start('main.js');

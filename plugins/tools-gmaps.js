@@ -1,6 +1,5 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import sharp from 'sharp';
 
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0';
 
@@ -13,14 +12,13 @@ async function jarak(dari, ke) {
     let $ = cheerio.load(html);
     let obj = {};
 
-    let img = html.split("var s=\'")?.[1]?.split("\'")?.[0];
-    obj.img = /^data:.*?\/.*?;base64,/i.test(img) ? Buffer.from(img.split(',')[1], 'base64') : '';
-    
-    // ngambil waktu jarak
+    let img = html.split("var s='")?.[1]?.split("'")?.[0];
+    obj.img = /^data:.*?\/.*?;base64,/i.test(img) ? Buffer.from(img.split(',')[1], 'base64') : null;
+
     obj.captions = [];
     $('div.BbbuR.uc9Qxb.uE1RRc').each((index, element) => {
         let caption = $(element).text()?.trim();
-        obj.captions.push(caption);
+        if (caption) obj.captions.push(caption);
     });
 
     return obj;
@@ -28,28 +26,37 @@ async function jarak(dari, ke) {
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
     let [dari, ke] = text.split('|');
-    if (!dari || !ke) throw `Ex: ${usedPrefix + command} pekalongan|sukabumi`;
-    
-    if (dari.toLowerCase() === ke.toLowerCase()) {
-        conn.reply(m.chat, "hey bung, kau dari kota bodoh mana ?!\nAWOKAWOAKOAK", m);
-        return;
+    if (!dari || !ke) throw `Contoh Penggunaan:\n*${usedPrefix + command} Jakarta|Bandung*`;
+
+    if (dari.toLowerCase().trim() === ke.toLowerCase().trim()) {
+        return conn.reply(m.chat, 'Jarak dari lokasi ke tempat yang sama adalah 0 km!', m);
     }
 
-    conn.reply(m.chat, "Tunggu sebentar yah, sedang diminta peta nya...", m);
+    conn.reply(m.chat, 'Tunggu sebentar, sedang mencari rute dan jarak...', m);
 
-    let result = await jarak(dari, ke);
+    try {
+        let result = await jarak(dari.trim(), ke.trim());
+        let mapUrl = `https://www.google.com/maps/dir/${encodeURIComponent(dari.trim())}/${encodeURIComponent(ke.trim())}/`;
+        let captionText = `🗺️ *RUTE & JARAK PERJALANAN*\n\n` +
+            `📍 *Dari* : ${dari.trim()}\n` +
+            `🎯 *Tujuan* : ${ke.trim()}\n\n` +
+            (result.captions.length ? `ℹ️ *Estimasi:* \n${result.captions.join('\n')}\n\n` : '') +
+            `🔗 *Buka di Google Maps:*\n${mapUrl}`;
 
-    if (result.img) {
-        let imgBuffer = Buffer.from(result.img, 'base64');
-        let resizedImgBuffer = await sharp(imgBuffer).toBuffer();
-
-        conn.sendMessage(m.chat, { image: resizedImgBuffer, caption: result.captions.join('\n') + `\n\nhttps://www.google.com/maps/dir/${encodeURIComponent(dari)}/${encodeURIComponent(ke)}/` }, { quoted: m });
-    } else {
-        conn.reply(m.chat, result.captions.join('\n') + `\n\nhttps://www.google.com/maps/dir/${encodeURIComponent(dari)}/${encodeURIComponent(ke)}/`, m);
+        if (result.img) {
+            await conn.sendMessage(m.chat, {
+                image: result.img,
+                caption: captionText
+            }, { quoted: m });
+        } else {
+            conn.reply(m.chat, captionText, m);
+        }
+    } catch (e) {
+        conn.reply(m.chat, `Gagal mencari rute: ${e.message || e}`, m);
     }
 };
 
-handler.help = ['jarak', 'gmaps'].map(v => v + ' dari|ke');
+handler.help = ['jarak <dari>|<ke>', 'gmaps <dari>|<ke>'];
 handler.tags = ['tools'];
 handler.command = /^(jarak|gmaps)$/i;
 

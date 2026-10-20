@@ -1,0 +1,130 @@
+import { watchFile, unwatchFile, readFileSync, existsSync } from 'fs';
+import chalk from 'chalk';
+import { fileURLToPath } from 'url';
+import moment from 'moment-timezone';
+
+function pickRandom(list) {
+	return list[Math.floor(list.length * Math.random())];
+}
+global.pickRandom = pickRandom;
+
+// Owner & Numbers
+global.owner = [
+	['628xxxxxxxxxx', 'OwnerName', true],
+];
+global.numberowner = '628xxxxxxxxxx';
+global.nameowner = 'OwnerName';
+global.name = 'OwnerName';
+global.pairingNumber = 628xxxxxxxxxx; // Ganti dengan nomor WhatsApp bot untuk pairing code
+
+// Bot Details & Watermark
+global.namebot = 'Elaina-MD';
+global.author = '⫹⫺ ᴇʟᴀɪɴᴀ 𝙱𝙾𝚃';
+global.packname = 'Kiyo•Editz™';
+global.stickpack = '-';
+global.stickauth = '⫹⫺ ᴇʟᴀɪɴᴀ 𝙱𝙾𝚃';
+global.wm = '*Elaina-MD*';
+global.footer = 'ꜱɪᴍᴘʟᴇ ᴡʜᴀᴛꜱᴀᴘᴘ ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ Kiyo•Editz™';
+global.set = {
+	footer: 'ꜱɪᴍᴘʟᴇ ᴡʜᴀᴛꜱᴀᴘᴘ ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ Kiyo•Editz™',
+};
+
+// Links & Socials
+global.source = 'https://chat.whatsapp.com/';
+global.mail = 'your-email@gmail.com';
+global.instagram = 'https://www.instagram.com/';
+global.partner = '';
+global.menu = 'https://telegra.ph/file/cce9ab4551f7150f1970d.jpg';
+global.playlist = '37i9dQZF1DWTwnEm1IYyoj';
+
+// Response Messages
+global.wait = '_*Tunggu sedang di proses...*_';
+global.eror = '_*Server Error*_';
+
+// Optional External Data Files
+global.mods = existsSync('./src/mods.json') ? JSON.parse(readFileSync('./src/mods.json')) : [];
+global.prems = existsSync('./src/premium.json') ? JSON.parse(readFileSync('./src/premium.json')) : [];
+global.link = existsSync('./src/grouplink.json') ? JSON.parse(readFileSync('./src/grouplink.json')) : [];
+global.group = global.link.map((v, i) => `Group ${i + 1}\n${v}`).join('\n\n');
+
+// API Keys & Prefixes (Isi dengan API Key Anda sendiri)
+global.lann = 'YOUR_BETABOTZ_API_KEY';
+global.btc = 'YOUR_BOTCAHX_API_KEY';
+global.geminiKey = 'YOUR_GEMINI_API_KEY';
+
+global.APIs = {
+	nrtm: 'https://nurutomo.herokuapp.com',
+	nrtm2: 'http://localhost:5000',
+	xteam: 'https://api.xteam.xyz',
+	vhtear: 'https://api.vhtear.com',
+	lann: 'https://api.betabotz.eu.org',
+	btc: 'https://api.botcahx.eu.org',
+	lolhuman: 'http://api.lolhuman.xyz',
+	alya: 'https://api.alyachan.dev/',
+};
+
+global.APIKeys = {
+	'https://api.zeks.xyz': 'YOUR_API_KEY',
+	'https://api.xteam.xyz': 'YOUR_API_KEY',
+	'http://api.lolhuman.xyz': 'YOUR_API_KEY',
+	'https://api.vhtear.com': 'YOUR_API_KEY',
+	'https://api.betabotz.eu.org': 'YOUR_API_KEY',
+	'https://api.botcahx.eu.org': 'YOUR_API_KEY',
+	'https://api.alyachan.dev/': 'YOUR_API_KEY',
+};
+
+// UI Decorations & Symbols
+global.htjava = pickRandom(['乂', '❏', '⫹⫺', '⎔', '✦', '⭔', '⬟']);
+global.pmenus = pickRandom(['乂', '◈', '➭', 'ଓ', '⟆•', '⳻', '•', '↬', '◈', '⭑', 'ᯬ', '◉', '᭻', '»', '〆', '々', '✗', '♪']);
+global.dtu = 'ɪɴꜱᴛᴀɢʀᴀᴍ';
+global.urlnya = '-';
+global.dtc = 'ᴄᴀʟʟ ᴏᴡɴᴇʀ';
+global.phn = '+62 8xx-xxxx-xxxx';
+
+// Readmore character
+global.readMore = String.fromCharCode(8206).repeat(4001);
+
+// Leveling & Multiplier
+global.multiplier = 69;
+
+// Time, Date & Greetings
+let wibh = moment.tz('Asia/Jakarta').format('HH');
+let wibm = moment.tz('Asia/Jakarta').format('mm');
+let wibs = moment.tz('Asia/Jakarta').format('ss');
+let wktuwib = `${wibh} H ${wibm} M ${wibs} S`;
+
+let d = new Date(new Date() + 3600000);
+let locale = 'id';
+let weton = ['Pahing', 'Pon', 'Wage', 'Kliwon', 'Legi'][Math.floor(d / 84600000) % 5];
+let week = d.toLocaleDateString(locale, { weekday: 'long' });
+let date = d.toLocaleDateString(locale, {
+	day: 'numeric',
+	month: 'long',
+	year: 'numeric',
+});
+
+global.botdate = `⫹⫺ Day's: ${week} ${date}`;
+global.bottime = `ᴛɪᴍᴇ: ${wktuwib}`;
+
+global.ucap = ucap;
+export function ucap() {
+	const hr = moment.tz('Asia/Jakarta').format('HH');
+	let res;
+	if (hr >= 2 && hr < 10) {
+		res = 'Pagi 🌤️🏞️';
+	} else if (hr >= 10 && hr <= 14) {
+		res = 'Siang ☀️🏝️';
+	} else if (hr > 14 && hr <= 17) {
+		res = 'Sore ⛅🌅';
+	} else {
+		res = 'Malam 🌙🌌';
+	}
+	return 'Selamat ' + res;
+}
+
+let file = fileURLToPath(import.meta.url);
+watchFile(file, () => {
+	unwatchFile(file);
+	console.log(chalk.redBright("Update 'config.js'"));
+	import(`${file}?update=${Date.now()}`);
+});

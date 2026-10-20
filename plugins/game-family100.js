@@ -1,32 +1,51 @@
-import { family100 } from '@bochilteam/scraper'
-const winScore = 4999
+import fs from 'fs';
+import path from 'path';
 
-async function handler(m) {
-    this.game = this.game ? this.game : {}
-    let id = 'family100_' + m.chat
-    if (id in this.game) {
-        this.reply(m.chat, 'Masih ada kuis yang belum terjawab di chat ini', this.game[id].msg)
-        throw false
-    }
-    const json = await family100()
-    let caption = `
-*Soal:* ${json.soal}
-Terdapat *${json.jawaban.length}* jawaban${json.jawaban.find(v => v.includes(' ')) ? `
-(beberapa jawaban terdapat spasi)
-`: ''}
-+${winScore} XP tiap jawaban benar
-    `.trim()
-    this.game[id] = {
-        id,
-        msg: await this.reply(m.chat, caption, m),
-        ...json,
-        terjawab: Array.from(json.jawaban, () => false),
-        winScore,
-    }
+const winScore = 500;
+let familyData = null;
+
+function getFamilyQuestions() {
+	if (!familyData) {
+		const filePath = path.resolve('./src/scrap/family.json');
+		familyData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+	}
+	return familyData;
 }
 
-handler.help = ['family100']
-handler.tags = ['game']
-handler.command = /^family100$/i
+const handler = async function (m) {
+	this.game = this.game ? this.game : {};
+	let id = 'family100_' + m.chat;
+	if (id in this.game) {
+		if (this.game[id].id !== undefined) {
+			return this.reply(m.chat, 'Masih ada kuis yang belum terjawab di chat ini\nKetik *Nyerah* untuk mengakhiri', this.game[id].msg);
+		}
+		delete this.game[id];
+		throw false;
+	}
+	this.game[id] = {};
+	const src = getFamilyQuestions();
+	const json = src[Math.floor(Math.random() * src.length)];
 
-export default handler
+	const caption = `
+*Soal:* ${json.soal}
+
+Terdapat *${json.jawaban.length}* jawaban${json.jawaban.find((v) => v.includes(' ')) ? '\n(beberapa jawaban terdapat spasi)\n' : ''}
+
++${winScore} XP tiap jawaban benar
+    `.trim();
+
+	this.game[id] = {
+		id,
+		msg: await m.reply(caption),
+		...json,
+		terjawab: Array.from(json.jawaban, () => false),
+		winScore,
+	};
+};
+
+handler.help = ['family100'];
+handler.tags = ['game'];
+handler.group = true;
+handler.command = /^family100$/i;
+
+export default handler;

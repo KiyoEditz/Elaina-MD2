@@ -1,30 +1,74 @@
-var handler = async (m, { conn, args }) => {
-    const url = args[0];
-    if (!url.startsWith('https://www.instagram.com/')) {
-        return conn.reply(m.chat, 'URL yang diberikan tidak valid.', m);
-    }
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 
-    try {
-        const response = await fetch(`https://bioskop-six.vercel.app/igp?u=${encodeURIComponent(url)}`);
-        const result = await response.json();
+const handler = async (m, { conn, text, usedPrefix, command }) => {
+   if (!text) return m.reply(`Masukkan URL Instagram!\nContoh: ${usedPrefix + command} https://www.instagram.com/p/xxx`);
 
-        if (response.status === 200) {
-            const mediaUrls = result.image_urls || []; 
+   try {
+      const igdl = async (url) => {
+         let { data } = await axios.get(`https://snapdownloader.com/tools/instagram-downloader/download?url=${encodeURIComponent(url)}`, {
+            headers: {
+               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            },
+            timeout: 15000
+         });
+         let $ = cheerio.load(data);
+         const result = [];
 
-            for (let mediaUrl of mediaUrls) {
-                await conn.sendFile(m.chat, mediaUrl, '', '', m);
-            }
-        } else {
-            throw new Error('Gagal mendapatkan media dari Instagram');
-        }
-    } catch (error) {
-        console.error(error);
-        conn.reply(m.chat, `Error: ${error.message}`, m);
-    }
-}
+         $(".download-item").each((i, el) => {
+            const type = $(el).find(".type").text().trim().toLowerCase();
+            const url = $(el).find(".btn-download").attr("href");
+            if (url) result.push({ type, url });
+         });
 
-handler.help = ['instagram'];
+         return result;
+      };
+
+      await conn.sendMessage(m.chat, {
+         react: {
+            text: "⏳",
+            key: m.key
+         }
+      });
+
+      const res = await igdl(text);
+      if (!res.length) return m.reply("Gagal mengambil media. Pastikan akun tidak diprivat dan URL valid.");
+
+      let linkList = res.map((v, i) => `${i + 1}. [${v.type}] ${v.url}`).join('\n');
+      let caption = `Berikut media yang berhasil diunduh:\n\n${linkList}`;
+
+      for (let i = 0; i < res.length; i++) {
+         let media = res[i];
+         if (media.type === "video") {
+            await conn.sendMessage(m.chat, {
+               video: { url: media.url },
+               caption
+            }, { quoted: m });
+         } else if (media.type === "photo" || media.type === "image") {
+            await conn.sendMessage(m.chat, {
+               image: { url: media.url },
+               caption
+            }, { quoted: m });
+         }
+      }
+
+      await conn.sendMessage(m.chat, {
+         react: {
+            text: "✔️",
+            key: m.key
+         }
+      });
+
+   } catch (e) {
+      console.error(e);
+      m.reply("Gagal mengunduh media Instagram!\n\n" + (e.message || e));
+   }
+};
+
+handler.command = ['igdl', 'ig', 'instagram'];
 handler.tags = ['downloader'];
-handler.command = /^(ig(dl)?|instagram(dl)?)$/i;
+handler.help = ['ig <url>'];
+handler.premium = false;
+handler.limit = false;
 
 export default handler;
