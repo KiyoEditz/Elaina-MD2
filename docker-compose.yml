@@ -6,6 +6,7 @@ services:
     stdin_open: true # needed for interactive terminal / pairing
     tty: true
     volumes:
+      - ./config.js:/app/config.js
       - ./sessions:/app/sessions
       - ./data:/app/data
       - ./tmp:/app/tmp

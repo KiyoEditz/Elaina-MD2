@@ -1,7 +1,20 @@
 node_modules
-npm-debug.log
-sessions
-tmp
+npm-debug.log*
 .git
 .gitignore
 .eslint*
+.prettier*
+
+# WhatsApp credentials & SQLite Database
+sessions
+sessions/
+data
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Temporary & Environment
+tmp
+tmp/
+.env

@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
 # Install system dependencies: ffmpeg, webp tools, imagemagick, and build tools for native addons (better-sqlite3)
 RUN apt-get update && apt-get install -y --no-install-recommends \
