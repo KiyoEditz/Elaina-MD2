@@ -9,6 +9,7 @@ config.js
 
 # WhatsApp sessions & Auth databases
 sessions/
+data/*
 sessions
 *.db
 *.db-shm
