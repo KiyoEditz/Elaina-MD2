@@ -15,7 +15,7 @@ global.owner = [
 global.numberowner = '628xxxxxxxxxx';
 global.nameowner = 'OwnerName';
 global.name = 'OwnerName';
-global.pairingNumber = 628xxxxxxxxxx; // Ganti dengan nomor WhatsApp bot untuk pairing code
+global.pairingNumber = 6281234567890; // Ganti dengan nomor WhatsApp bot untuk pairing code
 
 // Bot Details & Watermark
 global.namebot = 'Elaina-MD';
@@ -30,9 +30,9 @@ global.set = {
 };
 
 // Links & Socials
-global.source = 'https://chat.whatsapp.com/';
-global.mail = 'your-email@gmail.com';
-global.instagram = 'https://www.instagram.com/';
+global.source = 'https://chat.whatsapp.com/xxxx';
+global.mail = 'owner@email.com';
+global.instagram = 'https://www.instagram.com/owner';
 global.partner = '';
 global.menu = 'https://telegra.ph/file/cce9ab4551f7150f1970d.jpg';
 global.playlist = '37i9dQZF1DWTwnEm1IYyoj';
@@ -48,9 +48,13 @@ global.link = existsSync('./src/grouplink.json') ? JSON.parse(readFileSync('./sr
 global.group = global.link.map((v, i) => `Group ${i + 1}\n${v}`).join('\n\n');
 
 // API Keys & Prefixes (Isi dengan API Key Anda sendiri)
-global.lann = 'YOUR_BETABOTZ_API_KEY';
-global.btc = 'YOUR_BOTCAHX_API_KEY';
-global.geminiKey = 'YOUR_GEMINI_API_KEY';
+global.lann = 'YOUR_BETABOTZ_API_KEY'; // BetaBotz
+global.btc = 'YOUR_BOTCAHX_API_KEY'; // Botcahx
+global.geminiKey = 'YOUR_GEMINI_API_KEY'; // Google Gemini (https://aistudio.google.com/)
+global.lolkey = 'YOUR_LOLHUMAN_API_KEY'; // LOLHuman (https://api.lolhuman.xyz/)
+global.alya = 'YOUR_ALYACHAN_API_KEY'; // AlyaChan (https://api.alyachan.dev/)
+global.claudeKey = 'YOUR_CLAUDE_API_KEY'; // Anthropic Claude (sk-ant-api03-...)
+global.anthropicKeys = []; // Cadangan API keys Claude
 
 global.APIs = {
 	nrtm: 'https://nurutomo.herokuapp.com',
@@ -59,7 +63,7 @@ global.APIs = {
 	vhtear: 'https://api.vhtear.com',
 	lann: 'https://api.betabotz.eu.org',
 	btc: 'https://api.botcahx.eu.org',
-	lolhuman: 'http://api.lolhuman.xyz',
+	lolhuman: 'https://api.lolhuman.xyz',
 	alya: 'https://api.alyachan.dev/',
 };
 
@@ -67,11 +71,25 @@ global.APIKeys = {
 	'https://api.zeks.xyz': 'YOUR_API_KEY',
 	'https://api.xteam.xyz': 'YOUR_API_KEY',
 	'http://api.lolhuman.xyz': 'YOUR_API_KEY',
+	'https://api.lolhuman.xyz': 'YOUR_API_KEY',
 	'https://api.vhtear.com': 'YOUR_API_KEY',
 	'https://api.betabotz.eu.org': 'YOUR_API_KEY',
 	'https://api.botcahx.eu.org': 'YOUR_API_KEY',
 	'https://api.alyachan.dev/': 'YOUR_API_KEY',
 };
+
+global.API = (name, path = '/', query = {}, apikeyqueryname) =>
+	(name in global.APIs ? global.APIs[name] : name) +
+	path +
+	(query || apikeyqueryname
+		? '?' +
+		  new URLSearchParams(
+				Object.entries({
+					...query,
+					...(apikeyqueryname ? { [apikeyqueryname]: global.APIKeys[name in global.APIs ? global.APIs[name] : name] || global[name] || '' } : {}),
+				})
+		  )
+		: '');
 
 // UI Decorations & Symbols
 global.htjava = pickRandom(['乂', '❏', '⫹⫺', '⎔', '✦', '⭔', '⬟']);

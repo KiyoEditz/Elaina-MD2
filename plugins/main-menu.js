@@ -62,6 +62,7 @@ let handler = async (m, { conn, usedPrefix: _p, args }) => {
 					game: 'Game',
 					anime: 'Anime',
 					tools: 'Tools',
+					ai: 'Artificial Intelligence (AI)',
 					fun: 'Fun',
 					primbon: 'Primbon',
 					group: 'Group',

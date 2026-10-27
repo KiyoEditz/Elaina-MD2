@@ -26,19 +26,21 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     let thumbUrl = 'https://telegra.ph/file/4bae3d5130aabcbe94588.jpg';
 
     if (!mime) {
-      // Mode teks: coba gemini-2.0-flash, fallback ke gemini-1.5-flash
+      // Mode teks: coba gemini-2.5-flash, fallback ke gemini-3.5-flash dan gemini-1.5-flash
       let model;
       try {
-        model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+        model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         const result = await model.generateContent(text);
         responseText = result.response.text();
       } catch (err) {
-        if (/not found/i.test(err?.message)) {
-          model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' });
+        try {
+          model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
           const result = await model.generateContent(text);
           responseText = result.response.text();
-        } else {
-          throw err;
+        } catch {
+          model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+          const result = await model.generateContent(text);
+          responseText = result.response.text();
         }
       }
 
@@ -77,13 +79,19 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
       // Model multimodal (teks + gambar)
       let model;
       try {
-        model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         const result = await model.generateContent([imagePart, text]);
         responseText = result.response.text();
       } catch {
-        model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
-        const result = await model.generateContent([imagePart, text]);
-        responseText = result.response.text();
+        try {
+          model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+          const result = await model.generateContent([imagePart, text]);
+          responseText = result.response.text();
+        } catch {
+          model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+          const result = await model.generateContent([imagePart, text]);
+          responseText = result.response.text();
+        }
       }
 
       if (!responseText) throw new Error('Response kosong dari Gemini Vision API.');

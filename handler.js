@@ -148,6 +148,34 @@ export async function handler(chatUpdate) {
 					let chat = global.db.data.chats[m.chat];
 					if (name != 'tools-delete.js' && chat?.isBanned) return; // Except this
 				}
+
+				if (m.isGroup) {
+					let chat = global.db.data.chats[m.chat];
+					if (chat) {
+						if (chat.permanent || (chat.gcdate && chat.gcdate > Date.now())) {
+							chat.init = true;
+						}
+						const allowedPlugins = [
+							'owner-exec.js',
+							'owner-exec2.js',
+							'owner-expired.js',
+							'owner-leavegc.js',
+							'owner-banchat.js',
+							'owner-unbanchat.js',
+							'main-setting.js',
+							'main-sewa.js',
+							'group-redeem_use.js'
+						];
+						if (!allowedPlugins.includes(name) && !chat.init && !chat.isBanned && !isOwner) {
+							let botNumber = (this.user?.jid || global.conn?.user?.jid || '').split('@')[0];
+							return this.reply(
+								m.chat,
+								`Group ini belum diaktivasi\n*Dapatkan kode aktivasi* kemudian ketik ${usedPrefix}use _KODEREDEEMNYA_\n\n*Jika kamu belum punya kode, silahkan ketik _.claim kode_ di _chat pribadi_ untuk mendapatkan kode\nhttps://wa.me/${botNumber}?text=.claim+kode`,
+								m
+							);
+						}
+					}
+				}
 				if (plugin.rowner && plugin.owner && !(isROwner || isOwner)) {
 					// Both Owner
 					fail('owner', m, this);
